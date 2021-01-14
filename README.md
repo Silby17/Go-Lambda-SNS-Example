@@ -1,0 +1,1 @@
+# GO-Lambda-SNS-Example
