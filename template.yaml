@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+
+Resources:
+  ExampleTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: 'example-go-sns-topic'
+      TopicName: 'example-go-sns-topic'
+      Subscription:
+        - Protocol: lambda
+          Endpoint: !GetAtt ExampleFunction.Arn
+
+  ExampleFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SNS-Triggered-Lambda-Example
+      Runtime: go1.x
+      CodeUri: s3://example-s3-bucket/_lambda.zip
+      Handler: main
+      MemorySize: 128
+      Timeout: 120
+
+  ExampleFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref ExampleFunction
+      Principal: sns.amazonaws.com
+
+  ExampleTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref ExampleTopic
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'sns:Publish'
+              - 'sns:Subscribe'
+              - 'sns:Receive'
+            Resource: !Ref ExampleTopic
+            Principal:
+              AWS: '*'
+            Condition:
+              ArnLike:
+                AWS:SourceArn: !Sub 'arn:aws:*:*:${AWS::AccountId}:*'
