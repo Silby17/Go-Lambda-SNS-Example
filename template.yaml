@@ -7,7 +7,7 @@ Resources:
     Properties:
       FunctionName: SNS-Triggered-Lambda-Example
       Runtime: go1.x
-      CodeUri: s3://example-s3-bucket/_lambda.zip
+      CodeUri: s3://example-s3-bucket/_lambda.zip  # Update to point to your zipped Lambda in S3
       Handler: main
       MemorySize: 128
       Timeout: 120
